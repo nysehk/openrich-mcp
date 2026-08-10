@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.easy-tdx-state/
+dist/
+build/
+*.egg-info/

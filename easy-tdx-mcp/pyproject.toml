@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openrich-easy-tdx-mcp"
+version = "0.1.0"
+description = "Read-only MCP server for easy_tdx market data"
+requires-python = ">=3.12"
+dependencies = [
+  "easy-tdx>=1.1,<2",
+  "mcp>=1.0,<2",
+  "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.8"]
+
+[project.scripts]
+easy-tdx-mcp = "easy_tdx_mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/easy_tdx_mcp/server.py" = ["E402"]

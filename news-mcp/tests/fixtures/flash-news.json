@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "title": "华星精密发布年度业绩预告",
+      "content_text": "公司预计年度营业收入保持增长，应收账款风险仍需关注。",
+      "date_published": "2026-08-08T10:00:00Z",
+      "url": "https://example.test/news/huaxing-results"
+    },
+    {
+      "title": "央行发布最新政策",
+      "content_text": "政策信息。",
+      "date_published": "2026-08-08T09:00:00Z"
+    },
+    {
+      "title": "华星精密历史新闻",
+      "content_text": "超过时间窗口。",
+      "date_published": "2026-08-01T09:00:00Z"
+    }
+  ]
+}
+

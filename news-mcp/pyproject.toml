@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openrich-news-mcp"
+version = "0.1.0"
+description = "Read-only 24-hour financial flash-news MCP server"
+requires-python = ">=3.12"
+dependencies = [
+  "httpx>=0.28",
+  "mcp>=1.0,<2",
+  "pydantic>=2.10",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.8"]
+
+[project.scripts]
+openrich-news-mcp = "openrich_news_mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["src"]
+testpaths = ["tests"]
+
