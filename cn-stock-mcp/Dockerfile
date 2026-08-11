@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ ./src/
 
 ENV PYTHONPATH=/app/src
-EXPOSE 8000
+EXPOSE 7070
 
 # Default: HTTP/SSE mode for Docker deployment
-CMD ["python", "-m", "cn_stock_mcp", "--http", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "cn_stock_mcp", "--http", "--host", "0.0.0.0", "--port", "7070"]

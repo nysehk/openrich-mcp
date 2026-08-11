@@ -23,8 +23,8 @@ def main():
     parser.add_argument(
         "--port",
         type=int,
-        default=8000,
-        help="Port for HTTP/SSE mode (default: 8000)",
+        default=7070,
+        help="Port for HTTP/SSE mode (default: 7070)",
     )
     parser.add_argument(
         "--host",
@@ -37,8 +37,8 @@ def main():
     from .server import mcp
 
     if args.http:
-        mcp._host = args.host
-        mcp._port = args.port
+        mcp.settings.host = args.host
+        mcp.settings.port = args.port
         mcp.run(transport="sse")
     else:
         mcp.run(transport="stdio")

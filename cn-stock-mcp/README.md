@@ -67,8 +67,8 @@
 ### 安装
 
 ```bash
-git clone git@github.com:nysehk/openrich-mcp.git cn-stock-mcp
-cd cn-stock-mcp
+git clone git@github.com:nysehk/openrich-mcp.git openrich-mcp
+cd openrich-mcp/cn-stock-mcp
 pip install -e .
 ```
 
@@ -86,7 +86,7 @@ cn-stock-mcp: China Financial Data MCP Server based on AKShare
 options:
   -h, --help   show this help message and exit
   --http       Run in HTTP/SSE mode instead of stdio
-  --port PORT  Port for HTTP/SSE mode (default: 8000)
+  --port PORT  Port for HTTP/SSE mode (default: 7070)
   --host HOST  Host for HTTP/SSE mode (default: 127.0.0.1)
 ```
 
@@ -117,16 +117,52 @@ options:
 
 ### 方式二：HTTP/SSE 模式（通用 MCP Client）
 
+Windows 推荐使用仓库自带脚本，默认监听本机 `7070`：
+
+```powershell
+cd openrich-mcp\cn-stock-mcp
+
+# 前台启动，关闭终端即停止
+.\scripts\start-cn-stock-mcp.ps1
+
+# 后台启动并写入 .run 日志/PID
+.\scripts\start-cn-stock-mcp.ps1 -Background
+
+# 查看状态
+.\scripts\start-cn-stock-mcp.ps1 -Status
+
+# 停止脚本管理的后台进程
+.\scripts\start-cn-stock-mcp.ps1 -Stop
+```
+
+使用指定 Python 或自定义监听地址：
+
+```powershell
+.\scripts\start-cn-stock-mcp.ps1 -Background `
+  -Python "D:\anaconda3\python.exe" -BindHost "127.0.0.1" -Port 7070
+```
+
+Linux/macOS 或不使用 PowerShell 时：
+
 ```bash
 cd cn-stock-mcp
-PYTHONPATH=src python -m cn_stock_mcp --http --host 0.0.0.0 --port 8000
+PYTHONPATH=src python -m cn_stock_mcp --http --host 0.0.0.0 --port 7070
 ```
 
 MCP Client 连接 endpoint：
 
 ```
-http://<your-ip>:8000/sse
+http://<your-ip>:7070/sse
 ```
+
+OpenRich Banking Demo 的 `.env` 配置：
+
+```dotenv
+CN_STOCK_MCP_URL=http://127.0.0.1:7070/sse
+CN_STOCK_MCP_TIMEOUT_SECONDS=30
+```
+
+启动 Banking Demo 后，访问 `GET /banking/mcp/status`，应返回 `status: online` 和 `tool_count: 42`；Web 页面左下角“**MCP 服务**”也会展示地址、传输方式、在线状态和工具数量。
 
 ### 方式三：Docker
 
@@ -135,7 +171,7 @@ cd cn-stock-mcp
 docker compose up -d
 ```
 
-服务暴露在 `http://localhost:8000`。
+服务暴露在 `http://localhost:7070`。
 
 ---
 
