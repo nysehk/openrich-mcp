@@ -94,6 +94,9 @@ options:
 
 ## 📡 部署方式
 
+> 推荐生产式本机目录为 `D:\services\openrich-mcp`，与
+> `D:\claude\openrich` Harness 工作区分离。端口统一使用 `7070`，不要改回 8000。
+
 ### 方式一：stdio 模式（Claude Code / Cursor）
 
 在你的项目根目录 `.mcp.json` 中添加：
@@ -163,6 +166,10 @@ CN_STOCK_MCP_TIMEOUT_SECONDS=30
 ```
 
 启动 Banking Demo 后，访问 `GET /banking/mcp/status`，应返回 `status: online` 和 `tool_count: 42`；Web 页面左下角“**MCP 服务**”也会展示地址、传输方式、在线状态和工具数量。
+
+服务日志位于 `cn-stock-mcp/.run/cn-stock-mcp-7070.stdout.log` 和
+`cn-stock-mcp/.run/cn-stock-mcp-7070.stderr.log`；PID 位于同目录的
+`cn-stock-mcp-7070.pid`。
 
 ### 方式三：Docker
 
