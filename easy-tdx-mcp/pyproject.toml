@@ -4,17 +4,20 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openrich-easy-tdx-mcp"
-version = "0.1.0"
-description = "Read-only MCP server for easy_tdx market data"
+version = "0.3.0"
+description = "Self-contained Easy TDX fork with an LLM-friendly MCP server"
 requires-python = ">=3.12"
 dependencies = [
-  "easy-tdx>=1.1,<2",
   "mcp>=1.0,<2",
-  "pandas>=2.0",
+  "pandas>=2.0,<3",
+  "tzdata>=2024.1",
+  "click>=8.0,<9",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "ruff>=0.8"]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23", "ruff>=0.8"]
+science = ["scipy>=1.10,<1.16"]
+web = ["fastapi>=0.110,<1", "uvicorn[standard]>=0.29"]
 
 [project.scripts]
 easy-tdx-mcp = "easy_tdx_mcp.server:main"
