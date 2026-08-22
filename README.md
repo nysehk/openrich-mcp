@@ -12,6 +12,9 @@ openrich-mcp/
 
 本仓库与 OpenRich Harness 分开发布；各 MCP 服务共享本仓库历史，但可独立测试和部署。
 
+`easy-tdx-mcp` 的 OpenRich Quant/stdio 部署使用独立虚拟环境，完整配置见
+[`easy-tdx-mcp/docs/SERVICE_CONFIGURATION.md`](easy-tdx-mcp/docs/SERVICE_CONFIGURATION.md)。
+
 ## Windows 独立部署基线
 
 推荐将本仓库部署在 Harness 工作区之外：

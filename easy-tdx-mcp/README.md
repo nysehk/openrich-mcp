@@ -24,6 +24,10 @@
 
 ## 安装与启动
 
+OpenRich Quant 的 Windows 推荐目录、独立虚拟环境、环境变量、状态检查和更新流程见
+[`docs/SERVICE_CONFIGURATION.md`](docs/SERVICE_CONFIGURATION.md)。虚拟环境应放在
+`D:\claude\env\easy-tdx-mcp`，不要放入源码仓库。
+
 ```powershell
 & D:\anaconda3\python.exe -m pip install -e ".[dev]"
 & D:\anaconda3\python.exe -m easy_tdx_mcp.server
