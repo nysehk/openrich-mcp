@@ -60,7 +60,7 @@
 
 写文件工具统一受 `EASY_TDX_MCP_WRITE_ROOT` 限制；实时与全市场同步均有硬上限。
 
-当前目录验证基线为 105 个 tools、4 个 resources、67 个自动映射客户端工具。新增
+当前目录验证基线为 106 个 tools、4 个 resources、67 个自动映射客户端工具。新增
 `scripts/live_test_300308.py`，通过真实 MCP stdio 以 `SZ/300308` 为主样本遍历目录，
 并输出服务器 IP、端口、延迟、调用耗时及 PASS/FAIL/SKIP 分类。完整 live 结果不作为
 单元测试成功的替代；外部行情节点不可达应单列为运行环境问题。

@@ -98,7 +98,7 @@
 
 ## 9. 当前交付基线
 
-- MCP 目录：105 个 tools、4 个 resources。
+- MCP 目录：106 个 tools、4 个 resources。
 - 自动映射客户端工具：67 个，覆盖标准 A 股、Mac A 股、扩展市场及标准扩展协议。
 - 协议验证：必须通过真实 stdio `initialize`、`tools/list`、`resources/list` 和资源读取。
 - Live 验证：`scripts/live_test_300308.py` 遍历完整工具目录；外部节点不可达、无本地样本和

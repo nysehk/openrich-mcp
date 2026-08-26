@@ -16,6 +16,7 @@ from pydantic import BaseModel
 from typing import Any
 
 from .client_tools import register_client_tools
+from .batch_service import BatchMarketDataService
 from .advanced_tools import register_advanced_tools
 from .offline_tools import register_offline_tools
 from .research_tools import register_research_tools
@@ -40,6 +41,7 @@ mcp = FastMCP(
     ),
 )
 service = MarketDataService()
+batch_service = BatchMarketDataService()
 announcement_service = AnnouncementService()
 READ_ONLY = ToolAnnotations(
     readOnlyHint=True,
@@ -119,6 +121,39 @@ class AnnouncementResult(BaseModel):
     retrieved_at: str
     records: list[dict[str, Any]]
     data_gaps: list[str]
+
+
+@mcp.tool(
+    name="batch_kline",
+    description=(
+        "Fetch K-lines for up to 500 A-share, Hong Kong or US securities in one "
+        "MCP call. The server checks and caches the best protocol host once per "
+        "batch, uses async concurrent clients, and switches hosts on connection "
+        "failure. Markets: SH/SZ/BJ/HK_MAIN_BOARD/US_STOCK."
+    ),
+    annotations=READ_ONLY,
+    structured_output=True,
+)
+async def batch_kline(
+    securities: list[dict[str, str]],
+    count: int = 800,
+    period: str = "DAILY",
+    adjust: str = "QFQ",
+    concurrency: int = 50,
+    check_hosts: bool = True,
+    ping_timeout: float = 5.0,
+    output: str = "records",
+) -> dict[str, Any]:
+    return await batch_service.kline_batch(
+        securities,
+        count=count,
+        period=period,
+        adjust=adjust,
+        concurrency=concurrency,
+        check_hosts=check_hosts,
+        ping_timeout=ping_timeout,
+        output=output,
+    )
 
 
 @mcp.tool(

@@ -41,7 +41,7 @@ async def verify() -> None:
     missing = required - names
     if missing:
         raise SystemExit(f"missing MCP tools: {sorted(missing)}")
-    if len(tools.tools) != 105:
+    if len(tools.tools) != 106:
         raise SystemExit(f"unexpected tool count: {len(tools.tools)}")
     if len(resources.resources) != 4:
         raise SystemExit(f"unexpected resource count: {len(resources.resources)}")

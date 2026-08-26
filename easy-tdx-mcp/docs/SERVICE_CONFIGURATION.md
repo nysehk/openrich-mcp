@@ -93,7 +93,7 @@ Invoke-RestMethod http://127.0.0.1:9092/quant/mcp/status |
   ConvertTo-Json -Depth 6
 ```
 
-正常状态应为 `online`，工具总数为 105；默认策略允许 102 个只读工具并禁用 3 个写入工具。
+正常状态应为 `online`，工具总数为 106；默认策略允许 103 个只读工具并禁用 3 个写入工具。
 
 ## 5. 更新部署
 

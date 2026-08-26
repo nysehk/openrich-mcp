@@ -11,6 +11,7 @@ def test_self_contained_client_surface_is_exposed_as_distinct_tools():
 
     assert len(CLIENT_TOOL_NAMES) == 67
     assert "market_get_stock_kline" in names
+    assert "batch_kline" in names
     assert "standard_get_xdxr_info" in names
     assert "extended_goods_transaction_all" in names
     assert "extended_standard_get_markets" in names
