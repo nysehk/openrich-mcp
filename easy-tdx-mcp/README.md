@@ -24,16 +24,12 @@
 
 ## 安装与启动
 
-OpenRich Quant 的 Windows 推荐目录、独立虚拟环境、环境变量、状态检查和更新流程见
-[`docs/SERVICE_CONFIGURATION.md`](docs/SERVICE_CONFIGURATION.md)。虚拟环境应放在
-`D:\claude\env\easy-tdx-mcp`，不要放入源码仓库。
-
 ```powershell
-& D:\anaconda3\python.exe -m pip install -e ".[dev]"
-& D:\anaconda3\python.exe -m easy_tdx_mcp.server
+python -m pip install -e .
+python -m easy_tdx_mcp.server
 ```
 
-默认使用 MCP stdio transport，stdout 只输出协议帧。主站选择缓存写入当前目录 `.easy-tdx-state`；可通过 `EASY_TDX_MCP_STATE_DIR` 指定其他目录。
+默认使用 MCP stdio transport，stdout 只输出协议帧。主站选择缓存写入当前目录 `.easy-tdx-state`；可通过 `EASY_TDX_MCP_STATE_DIR` 指定其他目录。建议使用独立虚拟环境安装。
 
 ## LLM / Skill 如何选择工具
 
@@ -72,7 +68,7 @@ PDF 下载和离线同步不会默认获得任意磁盘写权限。未配置时�
 
 ```powershell
 $env:EASY_TDX_MCP_WRITE_ROOT = "C:\new_jyplug"
-& D:\anaconda3\python.exe -m easy_tdx_mcp.server
+python -m easy_tdx_mcp.server
 ```
 
 全市场同步必须用 `start`、`limit` 分页调用，单次最多处理 500 个 `.day` 文件。
