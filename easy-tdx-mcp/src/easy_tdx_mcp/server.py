@@ -157,6 +157,29 @@ async def batch_kline(
 
 
 @mcp.tool(
+    name="batch_security_metadata",
+    description=(
+        "Fetch normalized industry, concept, region, and style memberships for "
+        "up to 500 A-share securities. Markets: SH/SZ/BJ."
+    ),
+    annotations=READ_ONLY,
+    structured_output=True,
+)
+async def batch_security_metadata(
+    securities: list[dict[str, str]],
+    concurrency: int = 32,
+    check_hosts: bool = True,
+    ping_timeout: float = 5.0,
+) -> dict[str, Any]:
+    return await batch_service.security_metadata_batch(
+        securities,
+        concurrency=concurrency,
+        check_hosts=check_hosts,
+        ping_timeout=ping_timeout,
+    )
+
+
+@mcp.tool(
     name="kline",
     description=(
         "Get A-share K-line records. Market is SZ/SH/BJ; period supports DAILY, "

@@ -27,17 +27,21 @@ openrich-mcp/
 
 ## 快速开始
 
-环境要求：Python 3.12+。
+环境要求：Python 3.12+。建议每个服务使用独立虚拟环境，不要安装到
+Anaconda 全局环境；全局环境中已有同名 `easy_tdx` 包时，可能抢先覆盖本项目
+内置的协议实现。
 
 ### easy-tdx-mcp（stdio）
 
-```bash
+```cmd
+cd /d D:\claude
 git clone git@github.com:nysehk/openrich-mcp.git
-cd openrich-mcp/easy-tdx-mcp
-python -m pip install -e .
 
-# 启动 MCP stdio 服务（stdout 只输出协议帧）
-python -m easy_tdx_mcp.server
+D:\anaconda3\python.exe -m venv D:\claude\env\easy-tdx-mcp
+D:\claude\env\easy-tdx-mcp\Scripts\python.exe -m pip install -e D:\claude\openrich-mcp\easy-tdx-mcp
+
+REM 启动 MCP stdio 服务（stdout 只输出协议帧）
+D:\claude\env\easy-tdx-mcp\Scripts\python.exe -m easy_tdx_mcp.server
 ```
 
 - 主站选择缓存默认写入当前目录 `.easy-tdx-state`，可用 `EASY_TDX_MCP_STATE_DIR` 指定其他目录
@@ -56,10 +60,12 @@ PID 与日志位于 `cn-stock-mcp/.run/`；Docker 与完整参数见 [`cn-stock-
 
 ### news-mcp（stdio）
 
-```bash
-cd openrich-mcp/news-mcp
-python -m pip install -e .
-openrich-news-mcp
+```cmd
+D:\anaconda3\python.exe -m venv D:\claude\env\news-mcp
+D:\claude\env\news-mcp\Scripts\python.exe -m pip install -e D:\claude\openrich-mcp\news-mcp
+
+REM 启动 MCP stdio 服务
+D:\claude\env\news-mcp\Scripts\python.exe -m openrich_news_mcp.server
 ```
 
 ## 在 MCP 客户端中接入
@@ -70,9 +76,17 @@ openrich-news-mcp
 {
   "mcpServers": {
     "easy-tdx": {
-      "command": "python",
+      "command": "D:\\claude\\env\\easy-tdx-mcp\\Scripts\\python.exe",
       "args": ["-m", "easy_tdx_mcp.server"],
-      "env": { "EASY_TDX_MCP_STATE_DIR": "D:/data/easy-tdx-state" }
+      "cwd": "D:\\claude\\openrich-mcp\\easy-tdx-mcp",
+      "env": {
+        "EASY_TDX_MCP_STATE_DIR": "D:/claude/env/easy-tdx-mcp/state"
+      }
+    },
+    "news": {
+      "command": "D:\\claude\\env\\news-mcp\\Scripts\\python.exe",
+      "args": ["-m", "openrich_news_mcp.server"],
+      "cwd": "D:\\claude\\openrich-mcp\\news-mcp"
     }
   }
 }
@@ -92,9 +106,11 @@ openrich-news-mcp
 
 ## 更新
 
-```bash
+```cmd
+cd /d D:\claude\openrich-mcp
 git pull --ff-only
-python -m pip install -e .   # 对应服务目录内
+D:\claude\env\easy-tdx-mcp\Scripts\python.exe -m pip install -e .\easy-tdx-mcp
+D:\claude\env\news-mcp\Scripts\python.exe -m pip install -e .\news-mcp
 ```
 
 ## 免责声明

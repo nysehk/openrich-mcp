@@ -58,7 +58,10 @@ class SymbolBelongBoardCmd(BaseCommand[list[BelongBoardInfo]]):
             return []
 
         json_bytes = body[27:]
-        python_list: list[list[object]] = json.loads(json_bytes.decode("gbk", errors="replace"))
+        # TDX board names can contain GB18030 characters outside strict GBK.
+        # Never replace undecodable bytes here: replacement silently corrupts
+        # industry/concept names persisted by downstream quant services.
+        python_list: list[list[object]] = json.loads(json_bytes.decode("gb18030"))
 
         results: list[BelongBoardInfo] = []
         if not python_list:

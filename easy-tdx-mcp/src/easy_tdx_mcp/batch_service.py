@@ -38,6 +38,15 @@ PERIODS = {
     "YEARLY": Period.YEARLY,
 }
 ADJUSTMENTS = {"NONE": Adjust.NONE, "QFQ": Adjust.QFQ, "HFQ": Adjust.HFQ}
+CLASSIFICATION_MARKETS = {
+    "SH": int(Market.SH),
+    "SZ": int(Market.SZ),
+    "BJ": int(Market.BJ),
+}
+INDUSTRY_BOARD_TYPES = {12}
+CONCEPT_BOARD_TYPES = {4}
+REGION_BOARD_TYPES = {3}
+STYLE_BOARD_TYPES = {5}
 
 
 def _records(frame: pd.DataFrame | None) -> list[dict[str, Any]]:
@@ -50,6 +59,57 @@ def _records(frame: pd.DataFrame | None) -> list[dict[str, Any]]:
 
 def _retrieved_at() -> str:
     return datetime.now(UTC).isoformat()
+
+
+def _unique(values: list[str]) -> list[str]:
+    return list(dict.fromkeys(value for value in values if value))
+
+
+def _security_classifications(
+    market: str, frame: pd.DataFrame | None
+) -> dict[str, Any]:
+    records = _records(frame)
+    boards: list[dict[str, Any]] = []
+    industries: list[str] = []
+    concepts: list[str] = []
+    for row in records:
+        try:
+            board_type = int(row.get("board_type", row.get("type", -1)))
+        except (TypeError, ValueError):
+            board_type = -1
+        name = str(row.get("board_name") or row.get("name") or "").strip()
+        code = str(row.get("board_code") or row.get("code") or "").strip()
+        category = (
+            "industry"
+            if board_type in INDUSTRY_BOARD_TYPES
+            else "concept"
+            if board_type in CONCEPT_BOARD_TYPES
+            else "region"
+            if board_type in REGION_BOARD_TYPES
+            else "style"
+            if board_type in STYLE_BOARD_TYPES
+            else "other"
+        )
+        boards.append(
+            {
+                "type": category,
+                "board_type": board_type,
+                "code": code,
+                "name": name,
+            }
+        )
+        if category == "industry":
+            industries.append(name)
+        elif category == "concept":
+            concepts.append(name)
+    industries = _unique(industries)
+    concepts = _unique(concepts)
+    return {
+        "sector": industries[-1] if industries else "Unknown",
+        "industries": industries,
+        "concepts": concepts,
+        "boards": boards,
+    }
 
 
 def _signed_streak(values: list[float | None], *, positive: bool) -> int:
@@ -306,6 +366,90 @@ class BatchMarketDataService:
             "output": normalized_output,
             "concurrency": bounded_concurrency,
             "selected_hosts": selected_hosts,
+            "duration_ms": int((perf_counter() - started) * 1000),
+            "retrieved_at": _retrieved_at(),
+            "items": items,
+        }
+
+    async def security_metadata_batch(
+        self,
+        securities: list[dict[str, str]],
+        *,
+        concurrency: int = 32,
+        check_hosts: bool = True,
+        ping_timeout: float = 5.0,
+    ) -> dict[str, Any]:
+        """Return normalized industry and concept memberships for A-shares."""
+        if not securities:
+            raise ValueError("at least one security is required")
+        if len(securities) > 500:
+            raise ValueError("at most 500 securities may be requested at once")
+        normalized: list[dict[str, Any]] = []
+        for index, item in enumerate(securities):
+            market = MARKET_ALIASES.get(
+                str(item.get("market", "")).strip().upper(),
+                str(item.get("market", "")).strip().upper(),
+            )
+            code = str(item.get("code", "")).strip().upper()
+            if market not in A_SHARE_MARKETS:
+                raise ValueError(f"unsupported market at index {index}: {market}")
+            if not re.fullmatch(r"[0-9]{6}", code):
+                raise ValueError(f"invalid A-share code at index {index}: {code}")
+            normalized.append({"index": index, "market": market, "code": code})
+
+        host = await self._select_a_host(check_hosts, ping_timeout)
+        bounded_concurrency = max(1, min(int(concurrency), 100))
+        semaphore = asyncio.Semaphore(bounded_concurrency)
+        started = perf_counter()
+
+        async def fetch(item: dict[str, Any]) -> dict[str, Any]:
+            item_started = perf_counter()
+            try:
+                async with semaphore:
+                    client = self.a_client_factory(host=host)
+                    async with client as connected:
+                        frame = await connected.get_belong_board(
+                            CLASSIFICATION_MARKETS[item["market"]], item["code"]
+                        )
+                classifications = _security_classifications(item["market"], frame)
+                return {
+                    **item,
+                    "status": "available",
+                    **classifications,
+                    "retrieved_at": _retrieved_at(),
+                    "duration_ms": int((perf_counter() - item_started) * 1000),
+                    "data_gaps": (
+                        []
+                        if classifications["industries"] or classifications["concepts"]
+                        else ["no industry or concept memberships returned"]
+                    ),
+                    "error": None,
+                }
+            except Exception as exc:
+                return {
+                    **item,
+                    "status": "unavailable",
+                    "sector": "Unknown",
+                    "industries": [],
+                    "concepts": [],
+                    "boards": [],
+                    "retrieved_at": _retrieved_at(),
+                    "duration_ms": int((perf_counter() - item_started) * 1000),
+                    "data_gaps": [f"{type(exc).__name__}: {str(exc)[:500]}"],
+                    "error": f"{type(exc).__name__}: {str(exc)[:500]}",
+                }
+
+        items = await asyncio.gather(*(fetch(item) for item in normalized))
+        available = sum(item["status"] == "available" for item in items)
+        return {
+            "status": "available" if available else "unavailable",
+            "source": "easy_tdx",
+            "request_type": "security_metadata_batch",
+            "requested_count": len(items),
+            "available_count": available,
+            "error_count": len(items) - available,
+            "concurrency": bounded_concurrency,
+            "selected_hosts": {"classification": host},
             "duration_ms": int((perf_counter() - started) * 1000),
             "retrieved_at": _retrieved_at(),
             "items": items,
